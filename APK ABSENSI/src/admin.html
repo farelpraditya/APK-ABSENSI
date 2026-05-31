@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin — Pendaftaran Perangkat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #06070A; --bg2: #0D0F17; --accent: #00E5A0; --text: #F0F2FF; --text2: #8A8FAD; --border: rgba(255,255,255,0.07); --danger: #FF4D6D; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; padding: 40px 5%; }
+        .header-admin { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
+        h1 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; }
+        h1 span { color: var(--accent); }
+        .btn-danger { background: rgba(255, 77, 109, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-danger:hover { background: var(--danger); color: #000; }
+        .table-container { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 15px; }
+        th { background: rgba(255,255,255,0.02); padding: 18px 24px; font-family: 'Syne', sans-serif; font-weight: 700; color: var(--text2); border-bottom: 1px solid var(--border); }
+        td { padding: 18px 24px; border-bottom: 1px solid var(--border); }
+        tr:hover td { background: rgba(255,255,255,0.01); }
+        .badge-status { display: inline-block; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600; background: rgba(0, 229, 160, 0.1); color: var(--accent); border: 1px solid rgba(0, 229, 160, 0.2); }
+        .empty-state { text-align: center; padding: 60px 0; color: var(--text2); font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="header-admin">
+    <h1>Panel Sistem <span>Absensi Mobile</span></h1>
+    <button class="btn-danger" onclick="hapusSemuaData()">Hapus Semua Riwayat</button>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+        <tr>
+            <th>No</th>
+            <th>Email Karyawan</th>
+            <th>ID Device Terkunci</th>
+            <th>Waktu Konfirmasi</th>
+            <th>Status Verifikasi</th>
+        </tr>
+        </thead>
+        <tbody id="tabelPendaftar"></tbody>
+    </table>
+    <div id="pesanKosong" class="empty-state" style="display: none;">Belum ada verifikasi perangkat masuk.</div>
+</div>
+
+<script>
+    function muatDataAdmin() {
+        const tbody = document.getElementById('tabelPendaftar');
+        const pesanKosong = document.getElementById('pesanKosong');
+        let pendaftar = JSON.parse(localStorage.getItem('dataPendaftar')) || [];
+        tbody.innerHTML = "";
+
+        if (pendaftar.length === 0) {
+            pesanKosong.style.display = "block";
+            return;
+        }
+        pesanKosong.style.display = "none";
+
+        pendaftar.forEach((item, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="color: var(--text2);">${index + 1}</td>
+                <td style="font-weight: 500;">${item.email}</td>
+                <td style="font-family: monospace; color: var(--accent);">${item.id_device}</td>
+                <td>${item.waktu}</td>
+                <td><span class="badge-status">${item.status}</span></td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function hapusSemuaData() {
+        if (confirm("Hapus semua riwayat pendaftaran perangkat?")) {
+            localStorage.removeItem('dataPendaftar');
+            muatDataAdmin();
+        }
+    }
+    window.onload = muatDataAdmin;
+</script>
+</body>
+</html>

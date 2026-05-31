@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kunci Perangkat Baru — Absensi Mobile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #06070A;
+            --bg2: #0D0F17;
+            --accent: #00E5A0;
+            --text: #F0F2FF;
+            --text2: #8A8FAD;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .box {
+            background: var(--bg2);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.07);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        h2 { font-family: 'Syne', sans-serif; font-size: 24px; margin-bottom: 10px; }
+        p { color: var(--text2); font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+        input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            margin-bottom: 12px;
+            outline: none;
+        }
+        input:focus { border-color: var(--accent); }
+        input:disabled { opacity: 0.6; cursor: not-allowed; background: rgba(255,255,255,0.02); }
+        button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+            transition: opacity 0.2s;
+        }
+        button:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>🔒 Kunci ID Perangkat</h2>
+    <p>Identitas Anda terverifikasi. Silakan masukkan kode ID Perangkat HP Anda di bawah ini untuk didaftarkan ke sistem keamanan pusat.</p>
+
+    <form id="deviceForm">
+        <input type="email" id="confirmEmail" placeholder="Email Anda..." required readonly>
+        <input type="text" id="deviceId" placeholder="Masukkan ID Device HP Anda..." required autofocus>
+        <button type="submit">Daftarkan Perangkat ke Admin</button>
+    </form>
+</div>
+
+<script>
+    // MENGAMBIL EMAIL DARI PARAMETER URL (?email=...)
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const emailParam = urlParams.get('email');
+
+        if (emailParam) {
+            document.getElementById('confirmEmail').value = decodeURIComponent(emailParam);
+        } else {
+            document.getElementById('confirmEmail').removeAttribute('readonly');
+        }
+    };
+
+    // SUBMIT DATA UNTUK DISIMPAN DI LOCALSTORAGE
+    document.getElementById('deviceForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const email = document.getElementById('confirmEmail').value.trim();
+        const device = document.getElementById('deviceId').value.trim();
+
+        const opsiWaktu = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        const waktuSekarang = new Date().toLocaleDateString('id-ID', opsiWaktu);
+
+        let pendaftar = JSON.parse(localStorage.getItem('dataPendaftar')) || [];
+        pendaftar.push({
+            email: email,
+            id_device: device,
+            waktu: waktuSekarang,
+            status: 'Menunggu Persetujuan'
+        });
+        localStorage.setItem('dataPendaftar', JSON.stringify(pendaftar));
+
+        alert("Sukses! Data perangkat Anda berhasil dikirim ke Admin pusat.\n\nStatus perangkat Anda kini: Menunggu Persetujuan.");
+
+        document.body.innerHTML = `
+            <div class="box">
+                <h2>✅ Selesai</h2>
+                <p style="margin-bottom:0;">Formulir telah ditutup aman. Anda boleh menutup tab halaman browser ini sekarang.</p>
+            </div>
+        `;
+    });
+</script>
+</body>
+</html>
